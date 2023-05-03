@@ -10,13 +10,14 @@ import logging
 import time
 import hashlib
 import traceback
+import uuid
 
 try:
     from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 except:
     pass
 
-__version__ = "0.2"
+__version__ = "0.2.1"
 logger = logging.getLogger(__name__)
 
 class PathCacheException(Exception):
@@ -137,7 +138,13 @@ class PathCache:
 
         Returns a cache key.
         """
-        return lambda *args : self._make_key(**kwargs)
+        try:
+            return lambda *args : self._make_key(**kwargs)
+        except:
+            traceback.print_exc()
+            logger.exception('Exception when making cache key! Using random key to prevent caching')
+            return lambda *args : str(uuid.uuid4())
+
 
     def delete_path(self, **kwargs):
         """
