@@ -182,7 +182,7 @@ class PathCache:
         Delete all caches
         """
         if not self.cacheinstance.clear():
-            ret = all(self.delete_key(key) for key in self._get_all_keys(self.cacheinstance.get('PATHCACHE_keys')))
+            ret = all(self.delete_key(key) for key in self._get_all_keys(self.cacheinstance.get('PATHCACHE_keys') or {}))
             self.cacheinstance.set('PATHCACHE_keys', {}, timeout=0)
             return ret
         return True
@@ -262,7 +262,7 @@ class PathCache:
             time.sleep(0.1)
         
         self.cacheinstance.set('PATHCACHE_keyslock', True)
-        original_path_obj = self.cacheinstance.get('PATHCACHE_keys')
+        original_path_obj = self.cacheinstance.get('PATHCACHE_keys') or {}
         current_path = original_path_obj
         for i, path_part in enumerate(cache_path):
             key = str(path_part)
@@ -334,7 +334,7 @@ class PathCache:
             time.sleep(0.1)
         
         self.cacheinstance.set('PATHCACHE_keyslock', True)
-        original_path_obj = self.cacheinstance.get('PATHCACHE_keys')
+        original_path_obj = self.cacheinstance.get('PATHCACHE_keys') or {}
         current_path = original_path_obj
         for part in cache_path:
             if part not in current_path:
