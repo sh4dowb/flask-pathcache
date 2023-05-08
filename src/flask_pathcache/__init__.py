@@ -72,33 +72,34 @@ class PathCache:
             def decorated_function(*args, **kwargs):
                 try:
                     cache_key = (keyfn or self.key_function)(*args, **kwargs)
-                    if cache_key in self.deletefuture:
-                        logger.debug('Cache key was scheduled for delete, deleting cache and calling function')
-                        self.deletefuture.remove(cache_key)
-                        self._delete_key(cache_key)
-
-                    if cache_key is None:
-                        logger.debug('Cache key is None, skipping cache')
-                        return func(*args, **kwargs)
-                    
-                    logger.debug('Using cache key: %s', cache_key)
-                    cached_result = self.cacheinstance.get(cache_key)
-                    func_response = None
-                    if cached_result is None:
-                        logger.debug('Not found in cache, calling function')
-                        func_response = func(*args, **kwargs)
-                        cached_result = func_response
-                        if not self.cacheinstance.set(cache_key, func_response, timeout=timeout):
-                            logger.error('Failed to set cache value, check cache instance')
-                    else:
-                        logger.debug('Returning cached result')
-
-                    return cached_result
                 except:
                     traceback.print_exc()
-                    logger.exception('Cache exception! Returning non-cached result.')
+                    logger.exception('Cache exception while making key! Returning non-cached result.')
                     return func(*args, **kwargs)
-            
+
+                if cache_key in self.deletefuture:
+                    logger.debug('Cache key was scheduled for delete, deleting cache and calling function')
+                    self.deletefuture.remove(cache_key)
+                    self._delete_key(cache_key)
+
+                if cache_key is None:
+                    logger.debug('Cache key is None, skipping cache')
+                    return func(*args, **kwargs)
+                
+                logger.debug('Using cache key: %s', cache_key)
+                cached_result = self.cacheinstance.get(cache_key)
+                func_response = None
+                if cached_result is None:
+                    logger.debug('Not found in cache, calling function')
+                    func_response = func(*args, **kwargs)
+                    cached_result = func_response
+                    if not self.cacheinstance.set(cache_key, func_response, timeout=timeout):
+                        logger.error('Failed to set cache value, check cache instance')
+                else:
+                    logger.debug('Returning cached result')
+
+                return cached_result
+
             return decorated_function
         return decorator
     
