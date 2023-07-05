@@ -276,11 +276,11 @@ class PathCache:
         if readtime > 0.015:
             logger.warning('Reading PATHCACHE_keys took %s seconds', readtime)
             slowreads = (self.cacheinstance.get('PATHCACHE_slowreads') or 0) + 1
-            self.cacheinstance.set('PATHCACHE_slowreads', slowreads, timeout=0)
+            self.cacheinstance.set('PATHCACHE_slowreads', slowreads, timeout=600)
             if slowreads > 5:
                 logger.warning('Reading PATHCACHE_keys took %s seconds, too many slow reads, clearing all cache', readtime)
                 self.cacheinstance.set('PATHCACHE_keys', {}, timeout=0)
-                self.cacheinstance.set('PATHCACHE_slowreads', 0, timeout=0)
+                self.cacheinstance.set('PATHCACHE_slowreads', 0, timeout=600)
                 original_path_obj = {}
 
         current_path = original_path_obj
