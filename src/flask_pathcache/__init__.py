@@ -270,7 +270,19 @@ class PathCache:
             time.sleep(0.1)
         
         self.cacheinstance.set('PATHCACHE_keyslock', True)
+        readstart = time.time()
         original_path_obj = self.cacheinstance.get('PATHCACHE_keys') or {}
+        readtime = time.time() - readstart
+        if readtime > 0.015:
+            logger.warning('Reading PATHCACHE_keys took %s seconds', readtime)
+            slowreads = (self.cacheinstance.get('PATHCACHE_slowreads') or 0) + 1
+            self.cacheinstance.set('PATHCACHE_slowreads', slowreads, timeout=0)
+            if slowreads > 5:
+                logger.warning('Reading PATHCACHE_keys took %s seconds, too many slow reads, clearing all cache', readtime)
+                self.cacheinstance.set('PATHCACHE_keys', {}, timeout=0)
+                self.cacheinstance.set('PATHCACHE_slowreads', 0, timeout=0)
+                original_path_obj = {}
+
         current_path = original_path_obj
         for i, path_part in enumerate(cache_path):
             key = str(path_part)
