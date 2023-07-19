@@ -17,7 +17,7 @@ try:
 except:
     pass
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 logger = logging.getLogger(__name__)
 
 class PathCacheException(Exception):
@@ -189,10 +189,9 @@ class PathCache:
         """
         Delete all caches
         """
-        if not self.cacheinstance.clear():
-            ret = all(self.delete_key(key) for key in self._get_all_keys(self.cacheinstance.get('PATHCACHE_keys') or {}))
-            self.cacheinstance.set('PATHCACHE_keys', {}, timeout=0)
-            return ret
+        ret = [self._delete_key(key) for key in self._get_all_keys(self.cacheinstance.get('PATHCACHE_keys') or {})]
+        self.cacheinstance.set('PATHCACHE_keys', {}, timeout=0)
+        self.cacheinstance.set('PATHCACHE_slowreads', 0, timeout=600)
         return True
 
 
