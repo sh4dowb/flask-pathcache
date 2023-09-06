@@ -223,7 +223,8 @@ class PathCache:
     def _make_key(self, method=None, path=None, user=None, GET=None, POST=None, JSON=None, headers=None, parameter_order=None):
         logger.debug('_make_key called with %s', (method, path, user, GET, POST, JSON, headers))
         method = None if method == False else (method or request.method)
-        path = path or request.path
+        path = None if path == False else (path or request.path)
+        path = path() if callable(path) else path
         user = self._get_user(user)
 
         GET = request.args.keys() if GET == True else (GET or [])
