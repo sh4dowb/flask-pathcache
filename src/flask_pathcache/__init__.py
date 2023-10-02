@@ -214,7 +214,7 @@ class PathCache:
     def _get_user(self, user):
         if user == None:
             user = None
-        elif user == True:
+        elif user == True and isinstance(user, bool):
             verify_jwt_in_request()
             user = get_jwt_identity()
         elif isinstance(user, str) or isinstance(user, int):
