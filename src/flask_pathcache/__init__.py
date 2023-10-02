@@ -167,7 +167,12 @@ class PathCache:
         kwargs['recursive'] = kwargs.get('recursive', True)
         kwargs['future'] = kwargs.get('future', False)
 
-        parameters = self._make_path_from_parameters(kwargs, kwargs['parameter_order'])
+        try:
+            parameters = self._make_path_from_parameters(kwargs, kwargs['parameter_order'])
+        except:
+            logging.error('Error while making path for deleting cache!', exc_info=True)
+            return False
+            
         logger.debug('Made path: %s', parameters)
         if isinstance(parameters, dict) and not kwargs['recursive']:
             return False
